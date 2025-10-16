@@ -4,7 +4,6 @@
 #include <glbinding/gl/gl.h>
 #include <vector>
 #include <array>
-#include <cassert>
 
 using namespace gl;
 
