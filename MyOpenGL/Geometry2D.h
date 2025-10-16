@@ -7,6 +7,11 @@ using namespace gl;
 
 struct Point2D : public glm::vec3 {
 	constexpr Point2D() : glm::vec3(0.0f, 0.0f, 1.0f) {}
+	constexpr Point2D(float _x, float _y) : glm::vec3(_x, _y, 1.0f) {}
+	constexpr explicit Point2D(const float (&point)[2]) : glm::vec3(point[0], point[1], 1.0f) {}
+	constexpr explicit Point2D(const float (&point)[3]) : glm::vec3(point[0], point[1], point[2]) {}
+	constexpr explicit Point2D(const std::array<value_type, 2> &point) : glm::vec3(point[0], point[1], 1.0f) {}
+	constexpr explicit Point2D(const std::array<value_type, 3> &point) : glm::vec3(point[0], point[1], point[2]) {}
 	using glm::vec3::vec3;
 };
 using Vector2D = Point2D;
