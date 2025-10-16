@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <array>
+#include <cassert>
 using namespace gl;
 
 struct Point2D : public glm::vec3 {
@@ -18,7 +19,7 @@ struct Line2D {
 	constexpr Line2D(const Point2D &_a, const Point2D &_b) : a(_a), b(_b) {}
 	constexpr explicit Line2D(const Point2D (&points)[2]) : a(points[0]), b(points[1]) {}
 	constexpr explicit Line2D(const std::array<Point2D, 2> &points) : a(points[0]), b(points[1]) {}
-	explicit Line2D(const std::vector<Point2D> &points) : a(points[0]), b(points[1]) {}
+	explicit Line2D(const std::vector<Point2D> &points) : a(points.at(0)), b(points.at(1)) {}
 };
 
 struct Circle {
@@ -34,7 +35,7 @@ struct Triangle2D {
 	constexpr Triangle2D(const Point2D &a, const Point2D &b, const Point2D &c) : vertices{ a, b, c } {}
 	constexpr explicit Triangle2D(const Point2D (&points)[3]) : vertices{ points[0], points[1], points[2] } {}
 	constexpr explicit Triangle2D(const std::array<Point2D, 3> &points) : vertices{ points[0], points[1], points[2] } {}
-	explicit Triangle2D(const std::vector<Point2D> &points) : vertices{ points[0], points[1], points[2] } {}
+	explicit Triangle2D(const std::vector<Point2D> &points) : vertices{ points.at(0), points.at(1), points.at(2) } {}
 };
 
 struct Polygon2D {
