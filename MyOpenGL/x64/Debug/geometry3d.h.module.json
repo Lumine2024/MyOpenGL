@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "x64\\Debug\\Geometry3D.h.obj",
+            "outputs": [
+                "D:\\文档\\Visual Studio 2022\\C++\\MyOpenGL\\MyOpenGL\\x64\\Debug\\vc143.pdb",
+                "x64\\Debug\\",
+                "D:\\文档\\Visual Studio 2022\\C++\\MyOpenGL\\MyOpenGL\\x64\\Debug\\Geometry3D.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Geometry3D.h",
+                    "source-path": "d:\\文档\\visual studio 2022\\c++\\myopengl\\myopengl\\geometry3d.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}
