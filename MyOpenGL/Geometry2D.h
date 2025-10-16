@@ -3,7 +3,6 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <array>
-#include <cassert>
 using namespace gl;
 
 struct Point2D : public glm::vec3 {
