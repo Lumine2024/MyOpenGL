@@ -23,6 +23,9 @@ struct Line3D {
 	Point3D a, b;
 	Line3D() = default;
 	constexpr Line3D(const Point3D &_a, const Point3D &_b) : a(_a), b(_b) {}
+	constexpr explicit Line3D(const Point3D (&points)[2]) : a(points[0]), b(points[1]) {}
+	constexpr explicit Line3D(const std::array<Point3D, 2> &points) : a(points[0]), b(points[1]) {}
+	explicit Line3D(const std::vector<Point3D> &points) : a(points[0]), b(points[1]) {}
 	static constexpr auto type = GL_LINES;
 };
 
@@ -30,5 +33,8 @@ struct Triangle3D {
 	Point3D vertices[3];
 	Triangle3D() {}
 	constexpr Triangle3D(const Point3D &a, const Point3D &b, const Point3D &c) : vertices{ a, b, c } {}
+	constexpr explicit Triangle3D(const Point3D (&points)[3]) : vertices{ points[0], points[1], points[2] } {}
+	constexpr explicit Triangle3D(const std::array<Point3D, 3> &points) : vertices{ points[0], points[1], points[2] } {}
+	explicit Triangle3D(const std::vector<Point3D> &points) : vertices{ points[0], points[1], points[2] } {}
 	static constexpr auto type = GL_TRIANGLES;
 };
