@@ -13,6 +13,7 @@ struct Point2D : public glm::vec3 {
 	constexpr explicit Point2D(const std::array<value_type, 2> &point) : glm::vec3(point[0], point[1], 1.0f) {}
 	constexpr explicit Point2D(const std::array<value_type, 3> &point) : glm::vec3(point[0], point[1], point[2]) {}
 	using glm::vec3::vec3;
+	static constexpr auto type = GL_POINTS;
 };
 using Vector2D = Point2D;
 
@@ -24,13 +25,14 @@ struct Line2D {
 	constexpr explicit Line2D(const Point2D (&points)[2]) : a(points[0]), b(points[1]) {}
 	constexpr explicit Line2D(const std::array<Point2D, 2> &points) : a(points[0]), b(points[1]) {}
 	explicit Line2D(const std::vector<Point2D> &points) : a(points.at(0)), b(points.at(1)) {}
+	static constexpr auto type = GL_LINES;
 };
 
-struct Circle {
+struct Circle2D {
 	Point2D center;
 	GLfloat radius;
-	Circle() = default;
-	constexpr Circle(const Point2D &_center, GLfloat _radius) : center(_center), radius(_radius) {}
+	Circle2D() = default;
+	constexpr Circle2D(const Point2D &_center, GLfloat _radius) : center(_center), radius(_radius) {}
 };
 
 struct Triangle2D {
@@ -40,6 +42,7 @@ struct Triangle2D {
 	constexpr explicit Triangle2D(const Point2D (&points)[3]) : vertices{ points[0], points[1], points[2] } {}
 	constexpr explicit Triangle2D(const std::array<Point2D, 3> &points) : vertices{ points[0], points[1], points[2] } {}
 	explicit Triangle2D(const std::vector<Point2D> &points) : vertices{ points.at(0), points.at(1), points.at(2) } {}
+	static constexpr auto type = GL_TRIANGLES;
 };
 
 struct Polygon2D {

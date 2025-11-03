@@ -23,19 +23,19 @@ struct BatchData3D {
 	std::vector<GLenum> types;
 	BatchData3D() = default;
 	BatchData3D &addPoint(const Point3D &point, const glm::vec4 &color) {
-		data.push_back({point, color});
+		data.push_back({ point, color });
 		types.push_back(Point3D::type);
 		return *this;
 	}
 	BatchData3D &addLine(const Line3D &line, const glm::vec4 &color) {
-		data.push_back({line.a, color});
-		data.push_back({line.b, color});
+		data.push_back({ line.a, color });
+		data.push_back({ line.b, color });
 		types.push_back(Line3D::type);
 		return *this;
 	}
 	BatchData3D &addTriangle(const Triangle3D &triangle, const glm::vec4 &color) {
 		for(int i = 0; i < 3; ++i) {
-			data.push_back({triangle.vertices[i], color});
+			data.push_back({ triangle.vertices[i], color });
 		}
 		types.push_back(Triangle3D::type);
 		return *this;

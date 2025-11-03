@@ -14,7 +14,7 @@ using namespace gl;
 namespace fs = std::filesystem;
 
 struct PointData3D {
-	Point3D point;
+	Point3D point, norm;
 	glm::vec4 color;
 };
 
@@ -22,38 +22,34 @@ struct BatchData3D {
 	std::vector<PointData3D> data;
 	std::vector<GLenum> types;
 	BatchData3D() = default;
-	BatchData3D &addPoint(const Point3D &point, const glm::vec4 &color) {
-		data.push_back({point, color});
-		types.push_back(Point3D::type);
+	BatchData3D &addPoint(const Point3D &point, const Point3D &norm, const glm::vec4 &color) {
+		data.push_back({point, norm, color});
+		types.push_back(GL_POINTS);
 		return *this;
 	}
-	BatchData3D &addLine(const Line3D &line, const glm::vec4 &color) {
-		data.push_back({line.a, color});
-		data.push_back({line.b, color});
-		types.push_back(Line3D::type);
+	BatchData3D &addLine(const Line3D &line, const Point3D &norm, const glm::vec4 &color) {
+		data.push_back({line.a, norm, color});
+		data.push_back({line.b, norm, color});
+		types.push_back(GL_LINES);
 		return *this;
 	}
-	BatchData3D &addTriangle(const Triangle3D &triangle, const glm::vec4 &color) {
+	BatchData3D &addTriangle(const Triangle3D &triangle, const Point3D &norm, const glm::vec4 &color) {
 		for(int i = 0; i < 3; ++i) {
-			data.push_back({triangle.vertices[i], color});
+			data.push_back({triangle.vertices[i], norm, color});
 		}
-		types.push_back(Triangle3D::type);
+		types.push_back(GL_TRIANGLES);
 		return *this;
 	}
-	template<class T> BatchData3D &addGraph(const T &graph, const glm::vec4 &color) {
+	template<class T> BatchData3D &addGraph(const T &graph, const Point3D &norm, const glm::vec4 &color) {
 		if constexpr(T::type == GL_POINTS) {
-			addPoint(graph, color);
+			return addPoint(graph, norm, color);
 		} else if constexpr(T::type == GL_LINES) {
-			addLine(graph, color);
+			return addLine(graph, norm, color);
 		} else if constexpr(T::type == GL_TRIANGLES) {
-			addTriangle(graph, color);
+			return addTriangle(graph, norm, color);
 		} else {
 			static_assert(false, "Unknown graph type");
 		}
-		return *this;
-	}
-	template<class T> BatchData3D &operator<<(const std::pair<T, glm::vec4> &p) {
-		return addGraph(p.first, p.second);
 	}
 };
 
@@ -127,10 +123,12 @@ public:
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, data.data.size() * sizeof(PointData3D), data.data.data(), GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(PointData3D), (GLvoid *)offsetof(PointData3D, point));
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(PointData3D), (void *)offsetof(PointData3D, point));
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(PointData3D), (GLvoid *)offsetof(PointData3D, color));
+		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(PointData3D), (void *)offsetof(PointData3D, norm));
 		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(PointData3D), (GLvoid *)offsetof(PointData3D, color));
+		glEnableVertexAttribArray(2);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
@@ -146,6 +144,10 @@ public:
 	void setMVP(const glm::mat4 &mvp) {
 		GLint loc = glGetUniformLocation(program, "mvp");
 		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(mvp));
+	}
+	void setLight(const glm::vec4 &light) {
+		GLint loc = glGetUniformLocation(program, "light");
+		glUniform4fv(loc, 1, glm::value_ptr(light));
 	}
 
 	void drawLoop(const BatchData3D &data) {
