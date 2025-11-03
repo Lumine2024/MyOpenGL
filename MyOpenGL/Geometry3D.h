@@ -14,6 +14,7 @@ struct Point3D : public glm::vec4 {
 	constexpr explicit Point3D(const value_type (&point)[4]) : glm::vec4(point[0], point[1], point[2], point[3]) {}
 	constexpr explicit Point3D(const std::array<value_type, 3> &point) : glm::vec4(point[0], point[1], point[2], 1.0f) {}
 	constexpr explicit Point3D(const std::array<value_type, 4> &point) : glm::vec4(point[0], point[1], point[2], point[3]) {}
+	constexpr explicit Point3D(const glm::vec3 &point) : glm::vec4(point, 1.0f) {}
 	using glm::vec4::vec4;
 	static constexpr auto type = GL_POINTS;
 };

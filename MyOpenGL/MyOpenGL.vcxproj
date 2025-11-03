@@ -136,6 +136,7 @@
     <ClInclude Include="ShapeDrawer2D.h" />
     <ClInclude Include="Geometry2D.h" />
     <ClInclude Include="ShapeDrawer3D.h" />
+    <ClInclude Include="tiny_obj_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="FragmentShader2D.glsl" />

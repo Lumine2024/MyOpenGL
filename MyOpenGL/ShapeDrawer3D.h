@@ -8,8 +8,10 @@
 #include <fstream>
 #include <stdexcept>
 #include <utility>
+#include <filesystem>
 
 using namespace gl;
+namespace fs = std::filesystem;
 
 struct PointData3D {
 	Point3D point;
@@ -21,19 +23,19 @@ struct BatchData3D {
 	std::vector<GLenum> types;
 	BatchData3D() = default;
 	BatchData3D &addPoint(const Point3D &point, const glm::vec4 &color) {
-		data.push_back({ point, color });
+		data.push_back({point, color});
 		types.push_back(Point3D::type);
 		return *this;
 	}
 	BatchData3D &addLine(const Line3D &line, const glm::vec4 &color) {
-		data.push_back({ line.a, color });
-		data.push_back({ line.b, color });
+		data.push_back({line.a, color});
+		data.push_back({line.b, color});
 		types.push_back(Line3D::type);
 		return *this;
 	}
 	BatchData3D &addTriangle(const Triangle3D &triangle, const glm::vec4 &color) {
 		for(int i = 0; i < 3; ++i) {
-			data.push_back({ triangle.vertices[i], color });
+			data.push_back({triangle.vertices[i], color});
 		}
 		types.push_back(Triangle3D::type);
 		return *this;
@@ -81,12 +83,13 @@ public:
 			return shader;
 		};
 
-		std::ifstream fVertexShader("VertexShader3D.glsl");
+		fs::path pa = fs::path(__FILE__).parent_path();
+		std::ifstream fVertexShader(pa / "VertexShader3D.glsl");
 		fVertexShader.read(srcCodeBuffer, sizeof(srcCodeBuffer) - 1);
 		srcCodeBuffer[fVertexShader.gcount()] = '\0';
 		GLuint vertexShader = compileShader(GL_VERTEX_SHADER, srcCodeBuffer);
 		fVertexShader.close();
-		std::ifstream fFragmentShader("FragmentShader3D.glsl");
+		std::ifstream fFragmentShader(pa / "FragmentShader3D.glsl");
 		fFragmentShader.read(srcCodeBuffer, sizeof(srcCodeBuffer) - 1);
 		srcCodeBuffer[fFragmentShader.gcount()] = '\0';
 		GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, srcCodeBuffer);
