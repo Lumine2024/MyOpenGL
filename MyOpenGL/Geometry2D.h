@@ -12,6 +12,8 @@ struct Point2D : public glm::vec3 {
 	constexpr explicit Point2D(const value_type (&point)[3]) : glm::vec3(point[0], point[1], point[2]) {}
 	constexpr explicit Point2D(const std::array<value_type, 2> &point) : glm::vec3(point[0], point[1], 1.0f) {}
 	constexpr explicit Point2D(const std::array<value_type, 3> &point) : glm::vec3(point[0], point[1], point[2]) {}
+	explicit Point2D(const std::vector<value_type> &point) : glm::vec3(point[0], point[1], (point.size() <= 2 ? 1.0f : point[2])) {}
+	constexpr explicit Point2D(const glm::vec2 &point) : glm::vec3(point, 1.0f) {}
 	using glm::vec3::vec3;
 	static constexpr auto type = GL_POINTS;
 };
