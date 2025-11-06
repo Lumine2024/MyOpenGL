@@ -14,6 +14,7 @@ struct Point3D : public glm::vec4 {
 	constexpr explicit Point3D(const value_type (&point)[4]) : glm::vec4(point[0], point[1], point[2], point[3]) {}
 	constexpr explicit Point3D(const std::array<value_type, 3> &point) : glm::vec4(point[0], point[1], point[2], 1.0f) {}
 	constexpr explicit Point3D(const std::array<value_type, 4> &point) : glm::vec4(point[0], point[1], point[2], point[3]) {}
+	explicit Point3D(const std::vector<value_type> &point) : glm::vec4(point[0], point[1], point[2], (point.size() <= 3 ? 1.0f : point[3])) {}
 	constexpr explicit Point3D(const glm::vec3 &point) : glm::vec4(point, 1.0f) {}
 	using glm::vec4::vec4;
 	static constexpr auto type = GL_POINTS;
@@ -32,7 +33,7 @@ struct Line3D {
 
 struct Triangle3D {
 	Point3D vertices[3];
-	Triangle3D() {}
+	constexpr Triangle3D() {}
 	constexpr Triangle3D(const Point3D &a, const Point3D &b, const Point3D &c) : vertices{ a, b, c } {}
 	constexpr explicit Triangle3D(const Point3D (&points)[3]) : vertices{ points[0], points[1], points[2] } {}
 	constexpr explicit Triangle3D(const std::array<Point3D, 3> &points) : vertices{ points[0], points[1], points[2] } {}
