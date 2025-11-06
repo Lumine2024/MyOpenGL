@@ -1,7 +1,10 @@
 #define GLFW_INCLUDE_NONE
+#define GLFW_EXPOSE_NATIVE_WIN32
 #include <glbinding/gl/gl.h>
 #include <glbinding/glbinding.h>
+#include <Windows.h>
 #include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
@@ -9,10 +12,52 @@
 #include <functional>
 #include <cmath>
 #include "ShapeDrawer3D.h"
+
 using namespace gl;
+namespace fs = std::filesystem;
 
-//#include "ShapeDrawer.h"
+glm::vec3 center;
+float scale = 1.0f;
+float angle = 0.0f;
 
+void keybdEventCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+	if(action == GLFW_PRESS) {
+		switch(key) {
+			case GLFW_KEY_W: {
+				center.y -= 0.1f;
+				break;
+			}
+			case GLFW_KEY_S: {
+				center.y += 0.1f;
+				break;
+			}
+			case GLFW_KEY_A: {
+				center.x += 0.1f;
+				break;
+			}
+			case GLFW_KEY_D: {
+				center.x -= 0.1f;
+				break;
+			}
+			case GLFW_KEY_Z: {
+				scale *= 1.1f;
+				break;
+			}
+			case GLFW_KEY_C: {
+				scale /= 1.1f;
+				break;
+			}
+			case GLFW_KEY_Q: {
+				angle -= glm::radians(15.0f);
+				break;
+			}
+			case GLFW_KEY_E: {
+				angle += glm::radians(15.0f);
+				break;
+			}
+		}
+	}
+}
 
 int main() {
 	if(!glfwInit()) {
@@ -30,6 +75,11 @@ int main() {
 	}
 	glfwMakeContextCurrent(wnd);
 	glbinding::initialize(glfwGetProcAddress);
+
+	HWND hwnd = glfwGetWin32Window(wnd);
+	MessageBoxW(hwnd, L"WASD移动方向，ZC缩放，QE旋转", L"操作提示", MB_OK);
+
+	glfwSetKeyCallback(wnd, keybdEventCallback);
 
 	GLfloat vertices[][3] = {
 		{1.0f, 1.0f, 1.0f},
@@ -81,12 +131,21 @@ int main() {
 		100.0f);
 
 	while(!glfwWindowShouldClose(wnd)) {
-		float now = static_cast<float>(glfwGetTime());
-
+		glm::mat4 model(1.0f);
+		model = glm::translate(model, glm::vec3(center));
+		model = glm::rotate(model, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(scale));
 		glm::mat4 view = glm::lookAt(
-			glm::vec3(now, 4.0f, 5.0f),
-			glm::vec3(now - 3.0f, 0.0f, 0.0f),
-			glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::vec3(3.0f, 4.0f, 5.0f),
+			glm::vec3(0.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f)
+		);
+		glm::mat4 proj = glm::perspective(
+			glm::radians(45.0f),
+			800.0f / 800.0f,
+			0.1f,
+			100.0f
+		);
 		glm::mat4 mvp = proj * view * model;
 		drawer.setMVP(mvp);
 

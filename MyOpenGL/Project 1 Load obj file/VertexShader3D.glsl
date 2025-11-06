@@ -7,7 +7,7 @@ uniform vec4 light;
 out vec4 colorIn;
 void main() {
 	gl_Position = mvp * position;
-	float c = dot(light, norm);
+	float c = dot(light, normalize(mvp * norm));
 	float x = 1.0f - 0.5f * (1.0f - c);
 	colorIn = vec4(color.rgb * x, color.a);
 }

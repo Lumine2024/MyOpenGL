@@ -1,8 +1,11 @@
 #define GLFW_INCLUDE_NONE
 #define TINYOBJLOADER_IMPLEMENTATION
+#define GLFW_EXPOSE_NATIVE_WIN32
 #include <glbinding/gl/gl.h>
 #include <glbinding/glbinding.h>
+#include <Windows.h>
 #include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 #include <glm/glm.hpp>
 #include <iostream>
 #include <vector>
@@ -89,6 +92,49 @@ std::vector<std::pair<Triangle3D, Point3D>> convert(const std::vector<Vertex> &v
 	return triangles;
 }
 
+glm::vec3 center;
+float scale = 1.0f;
+float angle = 0.0f;
+
+void keybdEventCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	if(action == GLFW_PRESS) {
+		switch(key) {
+			case GLFW_KEY_W: {
+				center.y -= 0.1f;
+				break;
+			}
+			case GLFW_KEY_S: {
+				center.y += 0.1f;
+				break;
+			}
+			case GLFW_KEY_A: {
+				center.x += 0.1f;
+				break;
+			}
+			case GLFW_KEY_D: {
+				center.x -= 0.1f;
+				break;
+			}
+			case GLFW_KEY_Z: {
+				scale *= 1.1f;
+				break;
+			}
+			case GLFW_KEY_C: {
+				scale /= 1.1f;
+				break;
+			}
+			case GLFW_KEY_Q: {
+				angle -= glm::radians(15.0f);
+				break;
+			}
+			case GLFW_KEY_E: {
+				angle += glm::radians(15.0f);
+				break;
+			}
+		}
+	}
+}
+
 int main() {
 	if(!glfwInit()) {
 		std::cout << "init failed\n";
@@ -97,7 +143,7 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	GLFWwindow *wnd = glfwCreateWindow(800, 800, "Rotating rabbit", nullptr, nullptr);
+	GLFWwindow *wnd = glfwCreateWindow(800, 800, "Rabbit transform", nullptr, nullptr);
 	if(!wnd) {
 		std::cout << "create window failed\n";
 		glfwTerminate();
@@ -105,6 +151,11 @@ int main() {
 	}
 	glfwMakeContextCurrent(wnd);
 	glbinding::initialize(glfwGetProcAddress);
+
+	HWND hwnd = glfwGetWin32Window(wnd);
+	MessageBoxW(hwnd, L"WASD移动方向，ZC缩放，QE旋转", L"操作提示", MB_OK);
+
+	glfwSetKeyCallback(wnd, keybdEventCallback);
 
 	std::vector<Vertex> vertices;
 	std::vector<unsigned> indices;
@@ -121,18 +172,23 @@ int main() {
 	drawer.setLight(glm::vec4(1.0f, 0.0f, 0.0f, 0.0f));
 
 	while(!glfwWindowShouldClose(wnd)) {
-		float time = static_cast<float>(glfwGetTime());
-
 		glm::mat4 model(1.0f);
+		model = glm::translate(model, glm::vec3(center));
+		model = glm::rotate(model, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(scale));
 		glm::mat4 view = glm::lookAt(
-			glm::vec3(cosf(time) * 3.0f, 0.5f, sinf(time) * 3.0f),
-			glm::vec3(0.0f, 0.5f, 0.0f),
+			glm::vec3(0.0f, 0.0f, -2.0f),
+			glm::vec3(0.0f),
 			glm::vec3(0.0f, 1.0f, 0.0f)
 		);
-		glm::mat4 proj = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
+		glm::mat4 proj = glm::perspective(
+			glm::radians(45.0f),
+			800.0f / 800.0f,
+			0.1f,
+			100.0f
+		);
 		glm::mat4 mvp = proj * view * model;
 		drawer.setMVP(mvp);
-		drawer.setLight(glm::vec4(sinf(time) * sqrtf(3) / 2, 0.5f, -cosf(time) * sqrtf(3) / 2, 0.0f));
 
 		drawer.drawLoop(data);
 		
