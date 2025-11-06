@@ -48,7 +48,7 @@ void bezier(std::function<void(float, float)> setPixel) {
 		setPixel(points[0].x, points[0].y);
 		return;
 	}
-	constexpr int pixels = 1000;
+	constexpr int pixels = 10000;
 	constexpr float inc_per_pixel = 1.0f / static_cast<float>(pixels);
 	for(float t = 0.0f; t <= 0.9999f; t += inc_per_pixel) {
 		glm::vec3 pt(0.0f);
@@ -126,7 +126,7 @@ int main() {
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
 	glBindVertexArray(vao);
-	std::vector<glm::vec3> curve(1000);
+	std::vector<glm::vec3> curve(10000);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, curve.size() * sizeof(glm::vec3), nullptr, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (GLvoid *)0);
