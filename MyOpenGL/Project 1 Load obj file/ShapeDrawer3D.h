@@ -40,7 +40,7 @@ struct BatchData3D {
 		types.push_back(GL_TRIANGLES);
 		return *this;
 	}
-	template<class T> BatchData3D &addGraph(const T &graph, const Point3D &norm, const glm::vec4 &color) {
+	template<class T> BatchData3D &addShape(const T &graph, const Point3D &norm, const glm::vec4 &color) {
 		if constexpr(T::type == GL_POINTS) {
 			return addPoint(graph, norm, color);
 		} else if constexpr(T::type == GL_LINES) {
@@ -127,7 +127,7 @@ public:
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(PointData3D), (void *)offsetof(PointData3D, norm));
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(PointData3D), (GLvoid *)offsetof(PointData3D, color));
+		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(PointData3D), (void *)offsetof(PointData3D, color));
 		glEnableVertexAttribArray(2);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);

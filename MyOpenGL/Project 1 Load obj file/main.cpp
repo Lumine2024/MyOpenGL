@@ -100,11 +100,11 @@ void keybdEventCallback(GLFWwindow* window, int key, int scancode, int action, i
 	if(action == GLFW_PRESS) {
 		switch(key) {
 			case GLFW_KEY_W: {
-				center.y -= 0.1f;
+				center.y += 0.1f;
 				break;
 			}
 			case GLFW_KEY_S: {
-				center.y += 0.1f;
+				center.y -= 0.1f;
 				break;
 			}
 			case GLFW_KEY_A: {

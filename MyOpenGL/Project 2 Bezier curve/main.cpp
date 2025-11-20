@@ -1,7 +1,10 @@
 #define GLFW_INCLUDE_NONE
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <Windows.h>
 #include <glbinding/gl/gl.h>
 #include <glbinding/glbinding.h>
 #include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 #include <glm/glm.hpp>
 #include <iostream>
 #include <vector>
@@ -14,21 +17,17 @@ using namespace gl;
 namespace fs = std::filesystem;
 
 inline double binomial(int n, int m) {
-    if(n < 0 || m < 0 || m > n) return 0.0;
-    static std::vector<long double> fac = [] {
-        std::vector<long double> v(1);
-        v[0] = 1.0L;
-        return v;
-    }();
-    if(fac.size() <= n) {
-        int old = fac.size();
-        fac.resize(n + 1);
-        for(int i = old; i <= n; ++i) {
-            fac[i] = fac[i - 1] * i;
-        }
-    }
-    long double ret = fac[n] / (fac[m] * fac[n - m]);
-    return static_cast<double>(ret);
+	if(n < 0 || m < 0 || m > n) return 0.0;
+	static std::vector<double> fac = {1};
+	if(fac.size() <= n) {
+		int old = fac.size();
+		fac.resize(n + 1);
+		for(int i = old; i <= n; ++i) {
+			fac[i] = fac[i - 1] * i;
+		}
+	}
+	double ret = fac[n] / (fac[m] * fac[n - m]);
+	return ret;
 }
 
 std::vector<glm::vec3> points; // we have to set it globally
@@ -38,6 +37,8 @@ void mouseBtn(GLFWwindow *window, int btn, int action, int) {
 		double x, y;
 		glfwGetCursorPos(window, &x, &y);
 		points.push_back(glm::vec3(static_cast<float>(x / 400 - 1), static_cast<float>(1 - y / 400), 0.0f));
+	} else if(btn == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+		points.clear();
 	}
 }
 
@@ -50,7 +51,8 @@ void bezier(std::function<void(float, float)> setPixel) {
 	}
 	constexpr int pixels = 10000;
 	constexpr float inc_per_pixel = 1.0f / static_cast<float>(pixels);
-	for(float t = 0.0f; t <= 0.9999f; t += inc_per_pixel) {
+	for(int i = 0; i < pixels; ++i) {
+		float t = inc_per_pixel * static_cast<float>(i);
 		glm::vec3 pt(0.0f);
 		for(int i = 0; i < n; ++i) {
 			pt += static_cast<float>(binomial(n - 1, i)) * std::powf(1 - t, n - 1 - i) * std::powf(t, i) * points[i];
@@ -121,12 +123,15 @@ int main() {
 	glbinding::initialize(glfwGetProcAddress);
 	glfwSetMouseButtonCallback(wnd, mouseBtn);
 
+	HWND hwnd = glfwGetWin32Window(wnd);
+	MessageBoxW(hwnd, L"左键添加控制点，右键清空", L"操作提示", MB_OK);
+
 	GLuint program = initProgram();
 	GLuint vao, vbo;
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
 	glBindVertexArray(vao);
-	std::vector<glm::vec3> curve(10000);
+	std::vector<glm::vec3> curve(10050);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, curve.size() * sizeof(glm::vec3), nullptr, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (GLvoid *)0);
@@ -142,14 +147,21 @@ int main() {
 
 		bezier(setPixel);
 
+		for(auto point : points) {
+			setPixel(point.x, point.y);
+		}
+
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, curve.size() * sizeof(glm::vec3), curve.data());
 		glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(i));
-		
+
 		glfwSwapBuffers(wnd);
 		glfwPollEvents();
 	}
 
+	glDeleteProgram(program);
+	glDeleteVertexArrays(1, &vao);
+	glDeleteBuffers(1, &vbo);
 	glfwDestroyWindow(wnd);
 	glfwTerminate();
 	return 0;
