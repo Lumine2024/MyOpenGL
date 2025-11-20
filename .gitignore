@@ -45,3 +45,9 @@
 x64/
 
 !bunny_10k.obj
+/MyOpenGL/Project 2 Bezier curve/out/build/x64-Debug
+/MyOpenGL/.vscode
+*.zip
+*.doc
+*.docx
+/MyOpenGL/report.pdf
